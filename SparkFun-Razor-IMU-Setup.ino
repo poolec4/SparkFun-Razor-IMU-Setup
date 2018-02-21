@@ -172,7 +172,7 @@
 // Sensor data output interval in milliseconds
 // This may not work, if faster than 20ms (=50Hz)
 // Code is tuned for 20ms, so better leave it like that
-#define OUTPUT__DATA_INTERVAL 10  // in milliseconds
+#define OUTPUT__DATA_INTERVAL 20  // in milliseconds
 
 // Output mode definitions (do not change)
 #define OUTPUT__MODE_CALIBRATE_SENSORS 0 // Outputs sensor min/max values as text for manual calibration
@@ -519,100 +519,100 @@ void setup()
 void loop()
 {
   // Read incoming control messages
-  if (Serial.available() >= 2)
-  {
-    if (Serial.read() == '#') // Start of new control message
-    {
-      int command = Serial.read(); // Commands
-      if (command == 'f') // request one output _f_rame
-        output_single_on = true;
-      else if (command == 's') // _s_ynch request
-      {
-        // Read ID
-        byte id[2];
-        id[0] = readChar();
-        id[1] = readChar();
-        
-        // Reply with synch message
-        Serial.print("#SYNCH");
-        Serial.write(id, 2);
-        Serial.println();
-      }
-      else if (command == 'o') // Set _o_utput mode
-      {
-        char output_param = readChar();
-        if (output_param == 'n')  // Calibrate _n_ext sensor
-        {
-          curr_calibration_sensor = (curr_calibration_sensor + 1) % 3;
-          reset_calibration_session_flag = true;
-        }
-        else if (output_param == 't') // Output angles as _t_ext
-        {
-          output_mode = OUTPUT__MODE_ANGLES;
-          output_format = OUTPUT__FORMAT_TEXT;
-        }
-        else if (output_param == 'b') // Output angles in _b_inary format
-        {
-          output_mode = OUTPUT__MODE_ANGLES;
-          output_format = OUTPUT__FORMAT_BINARY;
-        }
-        else if (output_param == 'c') // Go to _c_alibration mode
-        {
-          output_mode = OUTPUT__MODE_CALIBRATE_SENSORS;
-          reset_calibration_session_flag = true;
-        }
-        else if (output_param == 's') // Output _s_ensor values
-        {
-          char values_param = readChar();
-          char format_param = readChar();
-          if (values_param == 'r')  // Output _r_aw sensor values
-            output_mode = OUTPUT__MODE_SENSORS_RAW;
-          else if (values_param == 'c')  // Output _c_alibrated sensor values
-            output_mode = OUTPUT__MODE_SENSORS_CALIB;
-          else if (values_param == 'b')  // Output _b_oth sensor values (raw and calibrated)
-            output_mode = OUTPUT__MODE_SENSORS_BOTH;
-
-          if (format_param == 't') // Output values as _t_text
-            output_format = OUTPUT__FORMAT_TEXT;
-          else if (format_param == 'b') // Output values in _b_inary format
-            output_format = OUTPUT__FORMAT_BINARY;
-        }
-        else if (output_param == '0') // Disable continuous streaming output
-        {
-          turn_output_stream_off();
-          reset_calibration_session_flag = true;
-        }
-        else if (output_param == '1') // Enable continuous streaming output
-        {
-          reset_calibration_session_flag = true;
-          turn_output_stream_on();
-        }
-        else if (output_param == 'e') // _e_rror output settings
-        {
-          char error_param = readChar();
-          if (error_param == '0') output_errors = false;
-          else if (error_param == '1') output_errors = true;
-          else if (error_param == 'c') // get error count
-          {
-            Serial.print("#AMG-ERR:");
-            Serial.print(num_accel_errors); Serial.print(",");
-            Serial.print(num_magn_errors); Serial.print(",");
-            Serial.println(num_gyro_errors);
-          }
-        }
-      }
-#if OUTPUT__HAS_RN_BLUETOOTH == true
-      // Read messages from bluetooth module
-      // For this to work, the connect/disconnect message prefix of the module has to be set to "#".
-      else if (command == 'C') // Bluetooth "#CONNECT" message (does the same as "#o1")
-        turn_output_stream_on();
-      else if (command == 'D') // Bluetooth "#DISCONNECT" message (does the same as "#o0")
-        turn_output_stream_off();
-#endif // OUTPUT__HAS_RN_BLUETOOTH == true
-    }
-    else
-    { } // Skip character
-  }
+//  if (Serial.available() >= 2)
+//  {
+//    if (Serial.read() == '#') // Start of new control message
+//    {
+//      int command = Serial.read(); // Commands
+//      if (command == 'f') // request one output _f_rame
+//        output_single_on = true;
+//      else if (command == 's') // _s_ynch request
+//      {
+//        // Read ID
+//        byte id[2];
+//        id[0] = readChar();
+//        id[1] = readChar();
+//        
+//        // Reply with synch message
+//        Serial.print("#SYNCH");
+//        Serial.write(id, 2);
+//        Serial.println();
+//      }
+//      else if (command == 'o') // Set _o_utput mode
+//      {
+//        char output_param = readChar();
+//        if (output_param == 'n')  // Calibrate _n_ext sensor
+//        {
+//          curr_calibration_sensor = (curr_calibration_sensor + 1) % 3;
+//          reset_calibration_session_flag = true;
+//        }
+//        else if (output_param == 't') // Output angles as _t_ext
+//        {
+//          output_mode = OUTPUT__MODE_ANGLES;
+//          output_format = OUTPUT__FORMAT_TEXT;
+//        }
+//        else if (output_param == 'b') // Output angles in _b_inary format
+//        {
+//          output_mode = OUTPUT__MODE_ANGLES;
+//          output_format = OUTPUT__FORMAT_BINARY;
+//        }
+//        else if (output_param == 'c') // Go to _c_alibration mode
+//        {
+//          output_mode = OUTPUT__MODE_CALIBRATE_SENSORS;
+//          reset_calibration_session_flag = true;
+//        }
+//        else if (output_param == 's') // Output _s_ensor values
+//        {
+//          char values_param = readChar();
+//          char format_param = readChar();
+//          if (values_param == 'r')  // Output _r_aw sensor values
+//            output_mode = OUTPUT__MODE_SENSORS_RAW;
+//          else if (values_param == 'c')  // Output _c_alibrated sensor values
+//            output_mode = OUTPUT__MODE_SENSORS_CALIB;
+//          else if (values_param == 'b')  // Output _b_oth sensor values (raw and calibrated)
+//            output_mode = OUTPUT__MODE_SENSORS_BOTH;
+//
+//          if (format_param == 't') // Output values as _t_text
+//            output_format = OUTPUT__FORMAT_TEXT;
+//          else if (format_param == 'b') // Output values in _b_inary format
+//            output_format = OUTPUT__FORMAT_BINARY;
+//        }
+//        else if (output_param == '0') // Disable continuous streaming output
+//        {
+//          turn_output_stream_off();
+//          reset_calibration_session_flag = true;
+//        }
+//        else if (output_param == '1') // Enable continuous streaming output
+//        {
+//          reset_calibration_session_flag = true;
+//          turn_output_stream_on();
+//        }
+//        else if (output_param == 'e') // _e_rror output settings
+//        {
+//          char error_param = readChar();
+//          if (error_param == '0') output_errors = false;
+//          else if (error_param == '1') output_errors = true;
+//          else if (error_param == 'c') // get error count
+//          {
+//            Serial.print("#AMG-ERR:");
+//            Serial.print(num_accel_errors); Serial.print(",");
+//            Serial.print(num_magn_errors); Serial.print(",");
+//            Serial.println(num_gyro_errors);
+//          }
+//        }
+//      }
+//#if OUTPUT__HAS_RN_BLUETOOTH == true
+//      // Read messages from bluetooth module
+//      // For this to work, the connect/disconnect message prefix of the module has to be set to "#".
+//      else if (command == 'C') // Bluetooth "#CONNECT" message (does the same as "#o1")
+//        turn_output_stream_on();
+//      else if (command == 'D') // Bluetooth "#DISCONNECT" message (does the same as "#o0")
+//        turn_output_stream_off();
+//#endif // OUTPUT__HAS_RN_BLUETOOTH == true
+//    }
+//    else
+//    { } // Skip character
+//  }
 
   // Time to read the sensors again?
   if((millis() - timestamp) >= OUTPUT__DATA_INTERVAL)
@@ -644,8 +644,10 @@ void loop()
       Euler_angles();
       
       if (output_stream_on || output_single_on) 
-      output_sensors_text(' ');
-      
+      if(Serial.available() && Serial.read()=='o')
+      {
+        output_sensors_text(' ');
+      }
     }
     else  // Output sensor values
     {      
